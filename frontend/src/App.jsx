@@ -1,26 +1,22 @@
-import React from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
-import Model from './models/Model'; // Importa el componente Model
+import { Auth0Provider } from '@auth0/auth0-react';
+import LoginButton from './components/loginButton';
+import LogoutButton from './components/logoutButton';
+import Profile from './components/showUserInfo';
 
-const App = () => {
+function App() {
   return (
-    <div style={{ margin: 0, height: '100vh', width: '100vw' }}>
-      <Canvas
-        camera={{ position: [0, 2.5, 5], fov: 75 }}
-        style={{ display: 'block' }}
-      >
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[1, 1, 1]} intensity={1} />
-        <Model />
-        <OrbitControls
-          enableDamping
-          dampingFactor={0.05}
-          maxPolarAngle={Math.PI / 2}
-        />
-      </Canvas>
-    </div>
+    <Auth0Provider
+      domain="dev-dfd7qvhsfiu2nhid.us.auth0.com"
+      clientId="XGIE1XTU8T8dizhG2i5BXpp1UJfJTgt6"
+      authorizationParams={{
+        redirect_uri: window.location.origin
+      }}
+    >
+      <LoginButton />
+      <LogoutButton/>
+      <Profile/>
+    </Auth0Provider>
   );
-};
+}
 
 export default App;
