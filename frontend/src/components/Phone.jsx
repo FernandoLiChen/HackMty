@@ -30,6 +30,18 @@ const Phone = () => {
                     <li><button><TbHanger className="w-16 h-16"/></button></li>
                     <li><button><TbSquareX onClick={moveTop} className="w-14 h-14"/></button></li>
                     </ul>
+                </div>
+                <div className="grid grid-cols-3 gap-4 p-6 h-1/2">
+                  <div className="">item</div>
+                  <div>item</div>
+                  <div>item</div>
+                  <div>item</div>
+                  <div>item</div>
+                  <div>item</div>
+                  <div>item</div>
+                  <div>item</div>
+
+
                 </div>   
                 <div className="left-1/4 bottom-6 absolute bg-black rounded-xl w-1/2 h-2">
                 </div> 
