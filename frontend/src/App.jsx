@@ -21,10 +21,10 @@ function App() {
       <LogoutButton/>
       <Profile/>
       <Scene/>
-    </Auth0Provider>
-    <Questions />
+      <Questions />
       <Text />
       <Phone />
+    </Auth0Provider>
   );
 }
 
