@@ -1,70 +1,20 @@
 import { useState, useEffect } from "react";
-import yourImage from "../assets/images/logo1.png"; // Replace with the correct path to your PNG image
-
-const initialQuestions = [
-  {
-    question: "Question: What is the primary purpose of a budget?",
-    answers: [
-      { text: "To increase debt", isCorrect: false },
-      { text: "To track and plan financial resources", isCorrect: true },
-      { text: "To avoid paying taxes", isCorrect: false },
-      { text: "To spend more on luxuries", isCorrect: false }
-    ]
-  },
-  {
-    question: "Question: What is an emergency fund?",
-    answers: [
-      { text: "Money set aside for unexpected expenses", isCorrect: true },
-      { text: "A fund for vacations", isCorrect: false },
-      { text: "A loan from a bank", isCorrect: false },
-      { text: "Investment in stocks", isCorrect: false }
-    ]
-  },
-  {
-    question: "Question: What does 'compound interest' mean?",
-    answers: [
-      { text: "Interest on the initial principal only", isCorrect: false },
-      { text: "Interest on the principal and accumulated interest", isCorrect: true },
-      { text: "Interest charged on overdue bills", isCorrect: false },
-      { text: "Interest that is fixed and unchanging", isCorrect: false }
-    ]
-  },
-  {
-    question: "Question: What is a 401(k) plan?",
-    answers: [
-      { text: "A retirement savings plan with tax benefits", isCorrect: true },
-      { text: "A type of insurance policy", isCorrect: false },
-      { text: "A short-term loan", isCorrect: false },
-      { text: "A credit card", isCorrect: false }
-    ]
-  },
-  {
-    question: "Question: What is diversification in investing?",
-    answers: [
-      { text: "Spreading investments across various assets", isCorrect: true },
-      { text: "Investing all money in one stock", isCorrect: false },
-      { text: "Holding cash instead of investments", isCorrect: false },
-      { text: "Investing in only one type of asset", isCorrect: false }
-    ]
-  }
-  // Add more questions as needed
-];
+import yourImage from "../assets/images/logo1.png"; // Asegúrate de tener el logo en el camino correcto
+import axios from "axios"; // Necesitamos axios para hacer la solicitud al backend
+import { useAuth0 } from "@auth0/auth0-react";
 
 const answerColors = [
   "bg-yellow-500", "bg-blue-600", "bg-slate-400", "bg-purple-600"
 ];
 
+// Función para barajar respuestas
 const shuffleArray = (array) => {
   let currentIndex = array.length, randomIndex;
 
-  // While there remain elements to shuffle.
   while (currentIndex !== 0) {
-
-    // Pick a remaining element.
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
 
-    // And swap it with the current element.
     [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
   }
 
@@ -72,32 +22,79 @@ const shuffleArray = (array) => {
 };
 
 const Questions = () => {
+  const {user} = useAuth0();
   const [isVisible, setIsVisible] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null);
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
+  const [quizCompleted, setQuizCompleted] = useState(false);
 
+  // Datos hardcodeados para enviar al backend
+  const age = 25; 
+  const occupation = "Estudiante"; 
+  const educationLevel = "Básico"; 
+  const preferences = "Digital";
+
+  // Función para obtener una nueva pregunta del backend
+  const fetchNewQuestion = async () => {
+    try {
+      const response = await axios.post('http://localhost:3001/generate-question', {
+        age,
+        occupation,
+        educationLevel,
+        preferences
+      });
+
+      const newQuestion = response.data;
+      const formattedQuestion = {
+        question: newQuestion.pregunta,
+        answers: [
+          { text: newQuestion.respuestas.a, isCorrect: newQuestion.respuesta_correcta === "a" },
+          { text: newQuestion.respuestas.b, isCorrect: newQuestion.respuesta_correcta === "b" },
+          { text: newQuestion.respuestas.c, isCorrect: newQuestion.respuesta_correcta === "c" },
+          { text: newQuestion.respuestas.d, isCorrect: newQuestion.respuesta_correcta === "d" }
+        ]
+      };
+
+      // Asegurarse de que las preguntas no se repitan
+      setQuestions(prevQuestions => {
+        const isDuplicate = prevQuestions.some(q => q.question === formattedQuestion.question);
+        if (!isDuplicate && prevQuestions.length < 5) {
+          return [...prevQuestions, formattedQuestion];
+        }
+        return prevQuestions;
+      });
+    } catch (error) {
+      console.error("Error al obtener la pregunta:", error);
+    }
+  };
+
+  // Obtener las primeras 5 preguntas cuando se monta el componente
   useEffect(() => {
-    // Shuffle questions and answers
-    const shuffledQuestions = shuffleArray(initialQuestions.map(q => ({
-      ...q,
-      answers: shuffleArray([...q.answers])
-    })));
-    setQuestions(shuffledQuestions);
-  }, []);
+    const interval = setInterval(() => {
+      if (questions.length < 5) {
+        fetchNewQuestion();
+      } else {
+        clearInterval(interval);
+      }
+    }, 500);
+
+    return () => clearInterval(interval); // Limpia el intervalo al desmontar
+  }, [questions]);
 
   const toggleTextBox = () => {
     setIsVisible(!isVisible);
     if (!isVisible) {
-      // Reset state when opening the quiz
-      setQuestions(shuffleArray(initialQuestions.map(q => ({
-        ...q,
-        answers: shuffleArray([...q.answers])
-      }))));
+      // Resetear estado al abrir el quiz
       setCurrentQuestionIndex(0);
       setSelectedAnswerIndex(null);
       setCorrectAnswersCount(0);
+      setQuizCompleted(false);
+      setQuestions([]); // Limpiar preguntas previas
+      for (let i = 0; i < 5; i++) {
+        fetchNewQuestion(); // Obtener otras 5 preguntas
+      }
     }
   };
 
@@ -111,26 +108,48 @@ const Questions = () => {
       setTimeout(() => {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         setSelectedAnswerIndex(null);
-      }, 1000); // Wait 1 second before going to the next question
+      }, 1000);
+    } else {
+      // Termina el quiz cuando se llega a la última pregunta
+      setTimeout(() => {
+        setQuizCompleted(true);
+      }, 1000);
     }
   };
 
-  const handleFinishClick = () => {
-    console.log("Quiz complete. Your score:", correctAnswersCount);
-    setIsVisible(false); // Close the quiz window
-    // Optionally, reset state if the quiz is reopened
-    setQuestions(shuffleArray(initialQuestions.map(q => ({
-      ...q,
-      answers: shuffleArray([...q.answers])
-    }))));
+  const handleFinishClick = async () => {
+    setIsVisible(false); // Cierra el quiz
+    setCurrentQuestionIndex(0);
+    setSelectedAnswerIndex(null);
+    setQuizCompleted(false);
+  
+    // Enviar puntos al backend
+    try {
+      await axios.post('http://localhost:3001/api/user-points', {
+        auth0UserId: user.sub, // Aquí puedes obtener el auth0UserId dinámicamente
+        points: correctAnswersCount  // Enviar la cantidad de respuestas correctas como puntos
+      });
+      console.log("Puntos enviados al backend con éxito");
+    } catch (error) {
+      console.error("Error al enviar los puntos:", error);
+    }
+  };
+  
+
+  const handlePlayAgain = () => {
+    // Reiniciar el quiz sin cerrar el modal
     setCurrentQuestionIndex(0);
     setSelectedAnswerIndex(null);
     setCorrectAnswersCount(0);
+    setQuizCompleted(false);
+    setQuestions([]); // Limpiar preguntas previas
+    for (let i = 0; i < 5; i++) {
+      fetchNewQuestion(); // Obtener otras 5 preguntas
+    }
   };
 
   return (
     <div className="">
-      {/* Button in the top right corner */}
       <div className="absolute top-4 right-4">
         <button
           onClick={toggleTextBox}
@@ -140,49 +159,71 @@ const Questions = () => {
         </button>
       </div>
 
-      {/* Quiz box that pops up from below */}
       <div
         className={`fixed top-0 left-0 w-2/3 lg:w-1/3 h-full bg-white border-gray-300 shadow-lg transition-transform transform ${
           isVisible ? "-translate-x-0" : "-translate-x-full"
         } duration-500 ease-in-out`}
       >
         <div className="relative flex flex-col justify-center md:items-center h-full p-6">
-          {/* PNG image on top of the quiz box */}
           <img
             src={yourImage}
             alt="Decorative"
             className="absolute top-4 left-1/2 transform -translate-x-1/2 p-8"
           />
 
-          <h1 className="text-lg md:text-2xl font-bold mb-4 mt-6 flex justify-center">{questions[currentQuestionIndex]?.question}</h1>
-
-          <div className="w-3/4 flex flex-col space-y-2">
-            {questions[currentQuestionIndex]?.answers.map((answer, index) => {
-              const buttonColor = answerColors[index % answerColors.length];
-              const buttonClasses = `p-4 rounded-md text-white ${selectedAnswerIndex === index ? (answer.isCorrect ? "bg-green-500" : "bg-red-500") : buttonColor}`;
-
-              return (
+          {quizCompleted ? (
+            // Muestra el mensaje de felicitación cuando el quiz está completado
+            <div className="flex flex-col items-center justify-center h-full">
+              <h1 className="text-lg md:text-2xl font-bold mb-4 mt-6">¡Buen trabajo!</h1>
+              <p>Has respondido {correctAnswersCount} de 5 preguntas correctamente.</p>
+              <div className="mt-6 space-x-4">
                 <button
-                  key={index}
-                  onClick={() => handleAnswerClick(index, answer.isCorrect)}
-                  className={buttonClasses}
-                  disabled={selectedAnswerIndex !== null}
+                  onClick={handlePlayAgain}
+                  className="p-4 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all"
                 >
-                  {answer.text}
+                  Volver a jugar
                 </button>
-              );
-            })}
-          </div>
+                <button
+                  onClick={handleFinishClick}
+                  className="p-4 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
+                >
+                  Salir
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Contador de preguntas */}
+              <div className="absolute top-4 right-8">
+                <p className="text-sm text-gray-500">
+                  Pregunta {currentQuestionIndex + 1} de 5
+                </p>
+              </div>
 
-          {/* Finish button at the end */}
-          {currentQuestionIndex === questions.length - 1 && (
-            <button
-              onClick={handleFinishClick}
-              className="absolute bottom-4 right-4 p-4 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all"
-            >
-              Finish
-            </button>
+              <h1 className="text-lg md:text-2xl font-bold mb-4 mt-6 flex justify-center">
+                {questions[currentQuestionIndex]?.question || "Loading..."}
+              </h1>
+
+              <div className="w-3/4 flex flex-col space-y-2">
+                {questions[currentQuestionIndex]?.answers.map((answer, index) => {
+                  const buttonColor = answerColors[index % answerColors.length];
+                  const buttonClasses = `p-4 rounded-md text-white ${selectedAnswerIndex === index ? (answer.isCorrect ? "bg-green-500" : "bg-red-500") : buttonColor}`;
+
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => handleAnswerClick(index, answer.isCorrect)}
+                      className={buttonClasses}
+                      disabled={selectedAnswerIndex !== null}
+                    >
+                      {answer.text}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
           )}
+
         </div>
       </div>
     </div>

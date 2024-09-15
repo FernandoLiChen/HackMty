@@ -23,6 +23,27 @@ const Scene = () => {
     setCameraState(cameraPositions[currentPositionIndex]);
   }, [currentPositionIndex]);
 
+  const renderSceneSpecificContent = () => {
+    switch (currentPositionIndex) {
+      case 0:
+        return <button className="botones">Hola</button>;
+      case 1:
+        return (
+          <div>
+            <p>Pregunta 1: ¿Cuál es tu color favorito?</p>
+            <button className="botones">Azul</button>
+            <button className="botones">Rojo</button>
+            <button className="botones">Verde</button>
+          </div>
+        );
+      case 2:
+        return <button className="botones">Escena 2 - Acción especial</button>;
+      // Puedes agregar más casos según el índice de la escena.
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="-z-40" style={{ margin: 0, height: '100vh', width: '100vw', position: 'absolute' }}>
       <Canvas style={{ display: 'block' }}>
@@ -35,12 +56,17 @@ const Scene = () => {
 
       <CameraInfo cameraState={cameraState} />
 
+      {/* Contenido específico para cada escena */}
+      <div className="scene-content">
+        {renderSceneSpecificContent()}
+      </div>
+
       {/* Botones de flecha */}
       <nav>
-        <button class="botones" onClick={handlePrevious}>&#9664;</button> {/* Flecha izquierda */}
-        <button class="botones" onClick={handleNext}>&#9654;</button> {/* Flecha derecha */}
+        <button className="botones" onClick={handlePrevious}>&#9664;</button> {/* Flecha izquierda */}
+        <button className="botones" onClick={handleNext}>&#9654;</button> {/* Flecha derecha */}
       </nav>
-    </div>  
+    </div>
   );
 };
 
