@@ -7,15 +7,15 @@ app.use(express.json());
 
 // Configura el cliente de Auth0 Management
 const auth0 = new ManagementClient({
-  domain: 'dev-dfd7qvhsfiu2nhid.us.auth0.com', // Reemplaza con tu dominio Auth0
-  clientId: 'XGIE1XTU8T8dizhG2i5BXpp1UJfJTgt6', // Reemplaza con tu clientId de Auth0
-  clientSecret: 'p5KzFjqWUKAqR4waV4uzCnEE9WqMp2CEM5o-sNFQ_BMkAytT8MzJnPfWOdKfN5wV', // Reemplaza con tu clientSecret de Auth0
+  domain: process.env.AUTH0_DOMAIN, // Reemplaza con tu dominio Auth0
+  clientId: process.env.AUTH0_CLIENTID, // Reemplaza con tu clientId de Auth0
+  clientSecret: process.env.AUTH0_CLIENTSECRET, // Reemplaza con tu clientSecret de Auth0
   scope: 'update:users',
 });
 
 // Middleware para verificar el token de ID
 const checkJwt = jwt({
-  secret: 'p5KzFjqWUKAqR4waV4uzCnEE9WqMp2CEM5o-sNFQ_BMkAytT8MzJnPfWOdKfN5wV', // Reemplaza con tu clientSecret
+  secret: process.env.AUTH0_CLIENTSECRET, // Reemplaza con tu clientSecret
   algorithms: ['HS256'],
 });
 

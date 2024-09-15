@@ -119,7 +119,7 @@ const Phone = () => {
                         className={`rounded-xl h-full w-full ${item.color} ${points >= item.cost ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
                         disabled={points < item.cost} // Disable button if insufficient points
                       >
-                      </button>
+                      </button> 
                       <div className="font-mono justify-center flex">
                         {points >= item.cost ? "Unlocked" : `Needs ${item.cost} points`}
                       </div>
