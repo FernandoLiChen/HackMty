@@ -80,8 +80,29 @@ const Scene = () => {
     }
   };
 
+  const renderSceneSpecificContent = () => {
+    switch (currentPositionIndex) {
+      case 0:
+        return <button className="botones">Hola</button>;
+      case 1:
+        return (
+          <div>
+            <p>Pregunta 1: ¿Cuál es tu color favorito?</p>
+            <button className="botones">Azul</button>
+            <button className="botones">Rojo</button>
+            <button className="botones">Verde</button>
+          </div>
+        );
+      case 2:
+        return <button className="botones">Escena 2 - Acción especial</button>;
+      // Puedes agregar más casos según el índice de la escena.
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div style={{ margin: 0, height: '100vh', width: '100vw', position: 'relative' }}>
+    <div className="-z-40" style={{ margin: 0, height: '100vh', width: '100vw', position: 'absolute' }}>
       <Canvas style={{ display: 'block' }}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[1, 1, 1]} intensity={1} />
@@ -111,6 +132,11 @@ const Scene = () => {
           </div>
         </div>
       )}
+
+      {/* Contenido específico para cada escena */}
+      <div className="scene-content">
+        {renderSceneSpecificContent()}
+      </div>
     </div>
   );
 };
