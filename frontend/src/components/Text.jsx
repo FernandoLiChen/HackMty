@@ -67,7 +67,7 @@ const Text = () => {
       <div className="absolute top-20 right-4">
         <button
           onClick={toggleTextBox}
-          className="p-4 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all"
+          className="p-4 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
         >
           Open Text Box
         </button>

@@ -81,11 +81,11 @@ const Landing = () => {
         <div id="hero-container" className="h-screen lg:h-5/6 sm:bg-center lg:bg-cover lg:bg-top">
           <div id="text-container" className="h-5/6 md:grid md:max-w-screen px-4 py-24 mx-auto md:px-20 lg:gap-8 xl:gap-10 md:py-24 md:pt-32 2xl:py-44 xl:py-28 lg:py-20 lg:grid-cols-2 justify-items items-center">
             <div className="flex flex-col items-center justify-center ">
-              <h1 className="sm:text-5xl max-w-screen mb-4 text-5xl font-bold tracking-tight leading-none md:text-5xl xl:text-7xl text-white"></h1>
+              <h1 className="sm:text-5xl max-w-screen  text-5xl font-bold tracking-tight leading-none md:text-5xl xl:text-7xl text-white"></h1>
             </div>
 
-            <div className="flex flex-col items-center justify-center text-2xl p-10">
-              <h1 className="m-2 text-white font-mono w-full flex text-center items-center text-4xl">Unete a una experiencia Interactiva</h1>
+            <div className="flex flex-col items-center justify-center text-2xl p-10 pt-0">
+              <h1 className="m-2 text-white font-mono w-full flex text-center items-center text-4xl font-bold">Unete a una experiencia Interactiva en BANORTE ACADEMY</h1>
               <div className="flex flex-row z-50">
                 <div className="bg-red-600 text-white py-4 m-4 px-11 rounded-full hover:bg-red-700"><LoginButton /></div>
                 <div className="bg-red-600 text-white py-4 m-4 px-11 rounded-full hover:bg-red-700"><LogoutButton /></div>

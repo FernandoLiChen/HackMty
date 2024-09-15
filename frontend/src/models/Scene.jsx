@@ -6,6 +6,7 @@ import CameraController from './CameraController';
 import CameraPosition from './CameraPosition';
 import Animation from './Animation';
 import './Scene.css';
+import Text from '../components/Text';
 import Questions from '../components/Questions';
 
 const Scene = () => {
@@ -16,14 +17,19 @@ const Scene = () => {
   const [showStartButton, setShowStartButton] = useState(true);
   const [resetModelPosition, setResetModelPosition] = useState(false);
   const [isRotating, setIsRotating] = useState(false); // Estado para controlar la rotación del modelo.
+  const [showQuestions, setShowQuestions] = useState(false); // Estado para controlar la visibilidad del Questions popup.
 
   useEffect(() => {
     switch (popupState) {
       case 0:
         break;
       case 1:
+        // Abre el pop-up de Questions y no hace nada más.
+        setShowQuestions(true);
         break;
       case 2:
+        // Cierra el pop-up de Questions y cambia la cámara a la siguiente posición.
+        setShowQuestions(false);
         setTransitionCount(prevCount => prevCount + 1);
         if (transitionCount >= 2) {
           const randomIndex = Math.floor(Math.random() * 3) + (CameraPosition.length - 3);
@@ -31,7 +37,7 @@ const Scene = () => {
         } else {
           setCurrentPositionIndex((prevIndex) => (prevIndex + 1) % CameraPosition.length);
         }
-        setPopupState(0);
+        setPopupState(0); // Resetea el estado del pop-up después de cerrar.
         break;
       default:
         break;
@@ -57,44 +63,9 @@ const Scene = () => {
     setResetModelPosition(false);
   };
 
-  const handlePointerDown = (event) => {
-    if (event.object.userData.isClickable) {
-      handlePlaneClick(); // Se abre el componente Questions.
-    }
-  };
-
   const handlePlaneClick = () => {
-    setPopupState(1);
-  };
-
-  const closePopup = () => {
-    setPopupState(0);
-  };
-
-  const handlePrevious = () => {
-    if (popupState === 0) {
-      setPopupState(1);
-    }
-  };
-
-  const renderSceneSpecificContent = () => {
-    switch (currentPositionIndex) {
-      case 0:
-        return <button className="botones">Hola</button>;
-      case 1:
-        return (
-          <div>
-            <p>Pregunta 1: ¿Cuál es tu color favorito?</p>
-            <button className="botones">Azul</button>
-            <button className="botones">Rojo</button>
-            <button className="botones">Verde</button>
-          </div>
-        );
-      case 2:
-        return <button className="botones">Escena 2 - Acción especial</button>;
-      default:
-        return null;
-    }
+    // Cambia entre abrir y cerrar el popup
+    setPopupState(popupState === 1 ? 2 : 1);
   };
 
   return (
@@ -118,17 +89,11 @@ const Scene = () => {
         </button>
       )}
 
-      {popupState === 1 && (
-        <div className="popup">
-          <div className="popup-content">
-            <Questions />
-          </div>
-        </div>
-      )}
+      {/* Botón "Open Text Box" siempre visible en la escena */}
+      <Text />
 
-      <div className="scene-content">
-        {renderSceneSpecificContent()}
-      </div>
+      {/* Renderiza el Questions popup si showQuestions es true */}
+      {showQuestions && <Questions />}
     </div>
   );
 };

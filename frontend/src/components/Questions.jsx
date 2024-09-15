@@ -4,7 +4,7 @@ import axios from "axios"; // Necesitamos axios para hacer la solicitud al backe
 import { useAuth0 } from "@auth0/auth0-react";
 
 const answerColors = [
-  "bg-yellow-500", "bg-blue-600", "bg-slate-400", "bg-purple-600"
+  "bg-red-800", "bg-red-800", "bg-red-800", "bg-red-800"
 ];
 
 // Función para barajar respuestas
@@ -116,6 +116,8 @@ const Questions = () => {
       setCorrectAnswersCount(0);
       setQuizCompleted(false);
       setQuestions([]); // Limpiar preguntas previas
+
+      fetchNewQuestion(); // Obtener la primera pregunta
     }
   };
 
@@ -145,7 +147,7 @@ const Questions = () => {
     setCurrentQuestionIndex(0);
     setSelectedAnswerIndex(null);
     setQuizCompleted(false);
-
+  
     // Enviar puntos al backend
     try {
       await axios.post('http://localhost:3001/api/user-points', {
@@ -157,6 +159,7 @@ const Questions = () => {
       console.error("Error al enviar los puntos:", error);
     }
   };
+  
 
   const handlePlayAgain = () => {
     // Reiniciar el quiz sin cerrar el modal
@@ -171,16 +174,18 @@ const Questions = () => {
   return (
     <div className="">
       <div className="absolute top-4 right-4">
-  <button
-    onClick={toggleTextBox}
-    className="start-button2"  // Cambiado de clase aquí
-  >
-  </button>
-</div>
-
+        <button
+          onClick={toggleTextBox}
+          className="p-4 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
+        >
+          Open Quiz
+        </button>
+      </div>
 
       <div
-        className={`fixed top-0 left-0 w-2/3 lg:w-1/3 h-full bg-white border-gray-300 shadow-lg transition-transform transform ${isVisible ? "translate-x-0" : "-translate-x-full"} duration-500 ease-in-out`}
+        className={`fixed top-0 left-0 w-2/3 lg:w-1/3 h-full bg-white border-gray-300 shadow-lg transition-transform transform ${
+          isVisible ? "-translate-x-0" : "-translate-x-full"
+        } duration-500 ease-in-out`}
       >
         <div className="relative flex flex-col justify-center md:items-center h-full p-6">
           <img
@@ -189,11 +194,7 @@ const Questions = () => {
             className="absolute top-4 left-1/2 transform -translate-x-1/2 p-8"
           />
 
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <p>Cargando preguntas...</p>
-            </div>
-          ) : quizCompleted ? (
+          {quizCompleted ? (
             // Muestra el mensaje de felicitación cuando el quiz está completado
             <div className="flex flex-col items-center justify-center h-full">
               <h1 className="text-lg md:text-2xl font-bold mb-4 mt-6">¡Buen trabajo!</h1>
@@ -245,10 +246,11 @@ const Questions = () => {
               </div>
             </>
           )}
+
         </div>
       </div>
     </div>
   );
 };
 
-export default Questions; 
+export default Questions;
