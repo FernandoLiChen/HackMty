@@ -40,7 +40,7 @@ const Landing = () => {
             <img className="w-15 h-10" src={Logo} alt="Logo"/>
           </div>
 
-          <div id="middleContainer" className="flex flex row items-center">
+          <div id="middleContainer" className="flex row items-center">
             <ul className="hidden md:flex font-sans gap-10 ">
               <a href="https://www.banorte.com/wps/portal/ixe/" target="_top"><li className="py-[1.45rem] uppercase text-xs font-medium">PREFERENTE</li></a>
               <a href="https://www.banorte.com/wps/portal/empresas/Home/circulo-pyme"><li className="py-[1.45rem] uppercase text-xs font-medium">PYMES</li></a>
