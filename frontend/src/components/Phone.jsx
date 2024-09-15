@@ -82,7 +82,7 @@ const Phone = () => {
       <div className={`-z-10 fixed top-0 right-0 w-full h-screen transition-all ease-in-out ${isVisible ? "fixed top-0 duration-1000" : "fixed top-[100%] duration-1000"}`}>
         <div className="flex justify-center items-center ">
 
-          <div className={`-z-10 top-20 absolute rounded-3xl h-3/5 w-2/4 md:w-1/4 lg:h-3/4 lg:w-1/5 ${bgColor} transition-transform transform duration-1000 ease-in-out`}>
+          <div className={`-z-10 top-20 absolute rounded-3xl h-3/5 w-2/4 lg:h-3/4 lg:w-1/5 ${bgColor} transition-transform transform duration-1000 ease-in-out`}>
             <div className={`absolute rounded-3xl left-[-11px] bottom-[-11px] bg-gray-200 h-full w-full ${borderColor} border-8`}>
               <div className="justify-center flex">
                 <ul className="w-3/4 h-16 items-center top-2 flex flex-row justify-center p-6 gap-2 lg:gap-0 xl:gap-6 bg-black rounded-full my-4 pb-4">

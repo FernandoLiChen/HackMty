@@ -24,7 +24,7 @@ const Scene = () => {
   }, [currentPositionIndex]);
 
   return (
-    <div style={{ margin: 0, height: '100vh', width: '100vw', position: 'relative' }}>
+    <div className="-z-40" style={{ margin: 0, height: '100vh', width: '100vw', position: 'absolute' }}>
       <Canvas style={{ display: 'block' }}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[1, 1, 1]} intensity={1} />
