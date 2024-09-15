@@ -2,6 +2,7 @@ import { Auth0Provider } from '@auth0/auth0-react';
 import LoginButton from './components/loginButton';
 import LogoutButton from './components/logoutButton';
 import Profile from './components/showUserInfo';
+import Scene from './models/Scene';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <LoginButton />
       <LogoutButton/>
       <Profile/>
+      <Scene/>
     </Auth0Provider>
   );
 }

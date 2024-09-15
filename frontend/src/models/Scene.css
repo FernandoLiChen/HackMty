@@ -1,0 +1,21 @@
+.botones {
+    background-color: #1d1f22;
+    color: white;
+    padding: 10px 20px;
+    margin: 0 10px; 
+    margin-bottom: 15px;
+    border-radius: 5px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .botones:hover {
+    background-color: #bd0505;
+  }
+  
+  nav {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
