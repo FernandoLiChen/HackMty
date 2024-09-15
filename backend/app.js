@@ -32,7 +32,7 @@ app.post('/generate-question', async (req, res) => {
   Ocupación: ${occupation}, 
   Nivel de educación financiera: ${educationLevel}, 
   Preferencias digitales: ${preferences}.
-  La pregunta y las respuestas deben estar en el siguiente formato JSON (Nota, solo es un ejemplo de formato! Tu crea las preguntas y respuestas y cambia el orden, no tiene que ser siempre b la respuesta correcta.):
+  La pregunta y las respuestas deben estar en el siguiente formato JSON (Nota, solo es un ejemplo de formato! Tu crea las preguntas y respuestas):
 
   {
       "pregunta": "¿Cuál es una estrategia recomendada para ahorrar dinero mientras eres estudiante?",
@@ -42,10 +42,10 @@ app.post('/generate-question', async (req, res) => {
           "c": "Tomar préstamos constantemente para mantener un estilo de vida lujoso",
           "d": "Ignorar completamente tus finanzas y gastar sin control"
       },
-      "respuesta_correcta": "b"
+      "respuesta_correcta": "a"
   }
 
-  Asegúrate de que la salida esté exactamente en este formato JSON, solo JSON, sin explicaciones adicionales.`;
+  Asegúrate de que la salida esté exactamente en este formato JSON, solo JSON, sin explicaciones adicionales y asegúrate que no se repitan posiciones de respuestas, es decir, que no sean todas b o asi.`;
 
   try {
     const response = await openAIClient.createChatCompletion({
