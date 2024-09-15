@@ -28,7 +28,7 @@ app.post('/generate-question', async (req, res) => {
   const { age, occupation, educationLevel, preferences } = req.body;
 
   const prompt = `Genera una pregunta de educación financiera para un usuario con los siguientes datos: 
-  Edad: ${age}, 
+  Edad: ${age} ten muy en cuenta su edad para sabes que palabras usar, 
   Ocupación: ${occupation}, 
   Nivel de educación financiera: ${educationLevel}, 
   Preferencias digitales: ${preferences}.
@@ -166,6 +166,41 @@ app.get('/api/user-points/:auth0UserId', async (req, res) => {
     console.error('Error al obtener los puntos del usuario:', error);
     res.status(500).send('Error al obtener los puntos del usuario');
   }
+});
+
+// Ruta para manejar las respuestas de las preguntas del cuestionario
+app.post('/api/save-answers', async (req, res) => {
+    const { auth0UserId, age, occupation, education_level, preferences } = req.body;
+
+    // Verificar qué datos está recibiendo el backend
+    console.log('Datos recibidos:', req.body);
+
+    try {
+        // Verificar si el usuario ya existe en la base de datos
+        const userExists = await pool.query('SELECT * FROM user_profile WHERE auth0_user_id = $1', [auth0UserId]);
+
+        if (userExists.rows.length > 0) {
+            // Si el usuario existe, actualizar los campos recibidos
+            let updateFields = [];
+            if (age) updateFields.push(pool.query('UPDATE user_profile SET age = $1 WHERE auth0_user_id = $2', [age, auth0UserId]));
+            if (occupation) updateFields.push(pool.query('UPDATE user_profile SET occupation = $1 WHERE auth0_user_id = $2', [occupation, auth0UserId]));
+            if (education_level) updateFields.push(pool.query('UPDATE user_profile SET education_level = $1 WHERE auth0_user_id = $2', [education_level, auth0UserId]));
+            if (preferences) updateFields.push(pool.query('UPDATE user_profile SET preferences = $1 WHERE auth0_user_id = $2', [preferences, auth0UserId]));
+
+            await Promise.all(updateFields); // Ejecutar todas las actualizaciones en paralelo
+            res.json({ message: 'Respuestas actualizadas' });
+        } else {
+            // Si el usuario no existe, insertar los nuevos datos
+            await pool.query(
+                'INSERT INTO user_profile (auth0_user_id, age, occupation, education_level, preferences) VALUES ($1, $2, $3, $4, $5)',
+                [auth0UserId, age || null, occupation || null, education_level || null, preferences || null]
+            );
+            res.json({ message: 'Respuestas guardadas' });
+        }
+    } catch (error) {
+        console.error('Error al guardar las respuestas:', error.message);
+        res.status(500).json({ error: 'Error al guardar las respuestas' });
+    }
 });
 
 const PORT = process.env.PORT || 3001;

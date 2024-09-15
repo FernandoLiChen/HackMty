@@ -22,23 +22,56 @@ const shuffleArray = (array) => {
 };
 
 const Questions = () => {
-  const { user } = useAuth0();
+  const { user, isAuthenticated, isLoading } = useAuth0(); // Asegúrate de que user esté cargado
   const [isVisible, setIsVisible] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null);
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(true); // Estado para controlar la carga del perfil
 
-  // Datos hardcodeados para enviar al backend
-  const age = 25; 
-  const occupation = "Estudiante"; 
-  const educationLevel = "Básico"; 
-  const preferences = "Digital";
+  // Datos del usuario obtenidos desde la base de datos
+  const [userProfile, setUserProfile] = useState({
+    age: null,
+    occupation: null,
+    educationLevel: null,
+    preferences: null,
+  });
+
+  // Obtener el perfil del usuario desde la base de datos
+  const fetchUserProfile = async () => {
+    if (!user || !user.sub) {
+      console.error("El objeto user no está disponible.");
+      return;
+    }
+    try {
+      const response = await axios.get(`http://localhost:3001/api/user-profile/${user.sub}`);
+      if (response.data) {
+        setUserProfile({
+          age: response.data.age,
+          occupation: response.data.occupation,
+          educationLevel: response.data.education_level, // Asegúrate de que los nombres de las columnas coincidan
+          preferences: response.data.preferences,
+        });
+      }
+      setLoadingProfile(false); // Perfil cargado correctamente
+    } catch (error) {
+      console.error("Error al obtener el perfil del usuario:", error);
+      setLoadingProfile(false); // Error al cargar el perfil
+    }
+  };
 
   // Función para obtener una nueva pregunta del backend
-  const fetchNewQuestions = async () => {
+  const fetchNewQuestion = async () => {
+    const { age, occupation, educationLevel, preferences } = userProfile;
+
+    // Verificar si faltan datos del perfil antes de intentar generar la pregunta
+    if (!age || !occupation || !educationLevel || !preferences) {
+      console.error("Faltan datos del perfil de usuario para generar preguntas.");
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:3001/generate-question', {
         age,
@@ -58,34 +91,22 @@ const Questions = () => {
         ]
       };
 
-      // Asegurarse de que las preguntas no se repitan
-      setQuestions(prevQuestions => {
-        const isDuplicate = prevQuestions.some(q => q.question === formattedQuestion.question);
-        if (!isDuplicate && prevQuestions.length < 5) {
-          return [...prevQuestions, formattedQuestion];
-        }
-        return prevQuestions;
-      });
+      // Añadir la pregunta a la lista de preguntas
+      setQuestions(prevQuestions => [...prevQuestions, formattedQuestion]);
+
     } catch (error) {
       console.error("Error al obtener la pregunta:", error);
     }
   };
 
-  // Obtener las primeras 5 preguntas cuando se monta el componente
+  // Obtener el perfil del usuario al montar el componente
   useEffect(() => {
-    const loadQuestions = async () => {
-      setLoading(true);
-      for (let i = 0; i < 5; i++) {
-        await fetchNewQuestions();
-      }
-      setLoading(false);
-    };
-
-    if (isVisible) {
-      loadQuestions();
+    if (isAuthenticated && !isLoading && user) {
+      fetchUserProfile(); // Obtener los datos del usuario cuando user esté cargado
     }
-  }, [isVisible]);
+  }, [isAuthenticated, isLoading, user]);
 
+  // Obtener una pregunta inicial cuando el quiz es visible
   const toggleTextBox = () => {
     setIsVisible(!isVisible);
     if (!isVisible) {
@@ -104,8 +125,10 @@ const Questions = () => {
       setCorrectAnswersCount(correctAnswersCount + 1);
     }
 
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < 4) {
+      // Generar la siguiente pregunta solo si no es la última
       setTimeout(() => {
+        fetchNewQuestion(); // Obtener una nueva pregunta
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         setSelectedAnswerIndex(null);
       }, 1000);
@@ -142,7 +165,7 @@ const Questions = () => {
     setCorrectAnswersCount(0);
     setQuizCompleted(false);
     setQuestions([]); // Limpiar preguntas previas
-    fetchNewQuestions(); // Obtener otras 5 preguntas
+    fetchNewQuestion(); // Obtener una nueva pregunta al empezar de nuevo
   };
 
   return (

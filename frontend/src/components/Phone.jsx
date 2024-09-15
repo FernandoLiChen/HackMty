@@ -3,29 +3,32 @@ import axios from "axios"; // Importar Axios para hacer peticiones HTTP
 import phoneHand from "../assets/images/phoneHand1.png";
 import banorteLogo from "../assets/images/logo.png";
 import { TbHanger, TbSquareX, TbCircleLetterP } from "react-icons/tb";
+import { useAuth0 } from "@auth0/auth0-react"; // Importar Auth0
 
 const Phone = () => {
+  const { user, isAuthenticated } = useAuth0(); // Obtener información del usuario autenticado
   const [isVisible, setIsVisible] = useState(false);
   const [activeDiv, setActiveDiv] = useState(null);
   const [bgColor, setBgColor] = useState('bg-slate-600'); // Initial background color
   const [borderColor, setBorderColor] = useState('border-slate-800'); // Initial border color
   const [points, setPoints] = useState(0); // Start with 0 points
   const [unlockedItems, setUnlockedItems] = useState({}); // Track unlocked items
-  const auth0UserId = "user_sub_id"; // El ID de usuario autenticado proporcionado por Auth0
 
   // Obtener los puntos del usuario al cargar el componente
   useEffect(() => {
     const fetchPoints = async () => {
-      try {
-        const response = await axios.get(`/api/user-points/${auth0UserId}`);
-        setPoints(response.data.points);
-      } catch (error) {
-        console.error('Error al obtener los puntos del usuario:', error);
+      if (isAuthenticated && user) {
+        try {
+          const response = await axios.get(`http://localhost:3001/api/user-points/${user.sub}`); // user.sub es el auth0UserId
+          setPoints(response.data.points);
+        } catch (error) {
+          console.error('Error al obtener los puntos del usuario:', error);
+        }
       }
     };
 
     fetchPoints();
-  }, [auth0UserId]);
+  }, [isAuthenticated, user]);
 
   const moveTop = () => {
     setIsVisible(!isVisible);

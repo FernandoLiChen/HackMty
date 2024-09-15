@@ -1,34 +1,64 @@
 import { useState } from "react";
 import yourImage from "../assets/images/logo1.png"; // Replace with the correct path to your PNG image
+import { MenuItem, FormControl, Select, InputLabel } from "@mui/material"; // Import Material-UI components
+import axios from 'axios'; // Para enviar los datos al backend
+import { useAuth0 } from '@auth0/auth0-react'; // Importar Auth0
 
 const questions = [
-  "Question 1: What is your name?",
-  "Question 2: What is your age?",
-  "Question 3: What is your favorite color?",
-  // Add more questions as needed
+  { id: "age", question: "¿Cuál es tu edad?", type: "dropdown", options: Array.from({ length: 100 }, (_, i) => i + 1) }, // Age options from 1 to 100
+  { id: "occupation", question: "¿Cuál es tu ocupación?", type: "dropdown", options: ["Estudiante", "Empleado", "Desempleado", "Retirado"] },
+  { id: "education_level", question: "¿Cuál es tu nivel de educación financiera?", type: "dropdown", options: ["Basica", "Intermedia", "Avanzada"] },
+  { id: "preferences", question: "¿Qué te gustaría aprender de finanzas?", type: "dropdown", options: ["Sobre tarjetas de crédito", "Sobre como ahorrar", "Sobre cómo evitar deudas", "Sobre cómo pedir un préstamo", "Sobre inversiones"] },
 ];
 
 const Text = () => {
+  const { user } = useAuth0(); // Obtener el ID de usuario de Auth0
   const [isVisible, setIsVisible] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answer, setAnswer] = useState("");
+  const [answers, setAnswers] = useState({
+    age: "",
+    occupation: "",
+    education_level: "",
+    preferences: "",
+  });
 
   const toggleTextBox = () => {
     setIsVisible(!isVisible);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault(); // Prevent default Enter key behavior (like adding a new line)
+  const handleNextQuestion = async () => {
+    const currentQuestionId = questions[currentQuestionIndex].id;
+    
+    // Verificar el valor de preferences
+    console.log('Valor de la respuesta:', answers[currentQuestionId]);
+
+    try {
+      // Hacer un POST al backend con cada respuesta individual
+      await axios.post('http://localhost:3001/api/save-answers', {
+        auth0UserId: user.sub, // Enviar el ID del usuario de Auth0
+        [currentQuestionId]: answers[currentQuestionId], // Enviar la respuesta para la pregunta actual
+      });
+      console.log(`Respuesta guardada para ${currentQuestionId}`);
+
+      // Si quedan más preguntas, avanzar a la siguiente
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setAnswer(""); // Clear the answer field for the next question
       } else {
-        // Optionally handle end of questions (e.g., submit answers)
-        console.log("All questions answered:", answer);
-        setIsVisible(false); // Hide the text box when done
+        setIsVisible(false); // Ocultar el cuadro de texto al finalizar
+        console.log('Cuestionario completado');
       }
+    } catch (error) {
+      console.error('Error al guardar las respuestas:', error);
     }
+  };
+
+  const handleDropdownChange = (e) => {
+    const { value } = e.target;
+    const currentQuestionId = questions[currentQuestionIndex].id;
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [currentQuestionId]: value,
+    }));
   };
 
   return (
@@ -57,16 +87,39 @@ const Text = () => {
             className="absolute top-4 left-1/2 transform -translate-x-1/2 p-8"
           />
 
-          <h1 className="text-2xl font-bold mb-4 mt-20">{questions[currentQuestionIndex]}</h1>
+          <h1 className="text-2xl font-bold mb-4 mt-20">{questions[currentQuestionIndex].question}</h1>
 
-          {/* Text area */}
-          <textarea
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type your answer here..."
-            className="w-3/4 h-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-          />
+          {/* Conditionally render a dropdown or textarea based on the question type */}
+          {questions[currentQuestionIndex].type === "dropdown" ? (
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <InputLabel>{questions[currentQuestionIndex].question}</InputLabel>
+              <Select
+                value={answers[questions[currentQuestionIndex].id] || ""}
+                onChange={handleDropdownChange}
+                label={questions[currentQuestionIndex].question}
+              >
+                {questions[currentQuestionIndex].options.map((option, index) => (
+                  <MenuItem key={index} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <textarea
+              value={answers[questions[currentQuestionIndex].id]}
+              onChange={handleDropdownChange}
+              placeholder="Type your answer here..."
+              className="w-3/4 h-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+            />
+          )}
+
+          <button
+            onClick={handleNextQuestion}
+            className="mt-4 p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-all"
+          >
+            {currentQuestionIndex < questions.length - 1 ? "Next" : "Submit"}
+          </button>
         </div>
       </div>
     </div>
