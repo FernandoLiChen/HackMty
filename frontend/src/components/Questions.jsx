@@ -51,7 +51,7 @@ const initialQuestions = [
 ];
 
 const answerColors = [
-  "bg-red-500", "bg-blue-500", "bg-yellow-500", "bg-purple-500"
+  "bg-yellow-500", "bg-blue-600", "bg-slate-400", "bg-purple-600"
 ];
 
 const shuffleArray = (array) => {
@@ -129,7 +129,7 @@ const Questions = () => {
   };
 
   return (
-    <div className="relative w-full h-screen">
+    <div className="">
       {/* Button in the top right corner */}
       <div className="absolute top-4 right-4">
         <button
@@ -142,11 +142,11 @@ const Questions = () => {
 
       {/* Quiz box that pops up from below */}
       <div
-        className={`fixed top-0 left-0 w-1/3 h-full bg-white border-gray-300 shadow-lg transition-transform transform ${
+        className={`fixed top-0 left-0 w-2/3 lg:w-1/3 h-full bg-white border-gray-300 shadow-lg transition-transform transform ${
           isVisible ? "-translate-x-0" : "-translate-x-full"
         } duration-500 ease-in-out`}
       >
-        <div className="relative flex flex-col justify-center items-center h-full p-6">
+        <div className="relative flex flex-col justify-center md:items-center h-full p-6">
           {/* PNG image on top of the quiz box */}
           <img
             src={yourImage}
@@ -154,7 +154,7 @@ const Questions = () => {
             className="absolute top-4 left-1/2 transform -translate-x-1/2 p-8"
           />
 
-          <h1 className="text-2xl font-bold mb-4 mt-20">{questions[currentQuestionIndex]?.question}</h1>
+          <h1 className="text-lg md:text-2xl font-bold mb-4 mt-6 flex justify-center">{questions[currentQuestionIndex]?.question}</h1>
 
           <div className="w-3/4 flex flex-col space-y-2">
             {questions[currentQuestionIndex]?.answers.map((answer, index) => {

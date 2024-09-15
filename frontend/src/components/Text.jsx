@@ -45,7 +45,7 @@ const Text = () => {
 
       {/* Text box that pops up from below */}
       <div
-        className={`fixed top-0 left-0 w-1/3 h-full bg-white border-gray-300 shadow-lg transition-transform transform ${
+        className={`fixed top-0 left-0 w-2/3 md:w-1/3 h-full bg-white border-gray-300 shadow-lg transition-transform transform ${
           isVisible ? "-translate-x-0" : "-translate-x-full"
         } duration-500 ease-in-out`}
       >
