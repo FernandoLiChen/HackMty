@@ -22,13 +22,14 @@ const shuffleArray = (array) => {
 };
 
 const Questions = () => {
-  const {user} = useAuth0();
+  const { user } = useAuth0();
   const [isVisible, setIsVisible] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null);
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Datos hardcodeados para enviar al backend
   const age = 25; 
@@ -37,7 +38,7 @@ const Questions = () => {
   const preferences = "Digital";
 
   // Función para obtener una nueva pregunta del backend
-  const fetchNewQuestion = async () => {
+  const fetchNewQuestions = async () => {
     try {
       const response = await axios.post('http://localhost:3001/generate-question', {
         age,
@@ -72,16 +73,18 @@ const Questions = () => {
 
   // Obtener las primeras 5 preguntas cuando se monta el componente
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (questions.length < 5) {
-        fetchNewQuestion();
-      } else {
-        clearInterval(interval);
+    const loadQuestions = async () => {
+      setLoading(true);
+      for (let i = 0; i < 5; i++) {
+        await fetchNewQuestions();
       }
-    }, 500);
+      setLoading(false);
+    };
 
-    return () => clearInterval(interval); // Limpia el intervalo al desmontar
-  }, [questions]);
+    if (isVisible) {
+      loadQuestions();
+    }
+  }, [isVisible]);
 
   const toggleTextBox = () => {
     setIsVisible(!isVisible);
@@ -92,9 +95,6 @@ const Questions = () => {
       setCorrectAnswersCount(0);
       setQuizCompleted(false);
       setQuestions([]); // Limpiar preguntas previas
-      for (let i = 0; i < 5; i++) {
-        fetchNewQuestion(); // Obtener otras 5 preguntas
-      }
     }
   };
 
@@ -122,7 +122,7 @@ const Questions = () => {
     setCurrentQuestionIndex(0);
     setSelectedAnswerIndex(null);
     setQuizCompleted(false);
-  
+
     // Enviar puntos al backend
     try {
       await axios.post('http://localhost:3001/api/user-points', {
@@ -134,7 +134,6 @@ const Questions = () => {
       console.error("Error al enviar los puntos:", error);
     }
   };
-  
 
   const handlePlayAgain = () => {
     // Reiniciar el quiz sin cerrar el modal
@@ -143,26 +142,22 @@ const Questions = () => {
     setCorrectAnswersCount(0);
     setQuizCompleted(false);
     setQuestions([]); // Limpiar preguntas previas
-    for (let i = 0; i < 5; i++) {
-      fetchNewQuestion(); // Obtener otras 5 preguntas
-    }
+    fetchNewQuestions(); // Obtener otras 5 preguntas
   };
 
   return (
     <div className="">
       <div className="absolute top-4 right-4">
-        <button
-          onClick={toggleTextBox}
-          className="p-4 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all"
-        >
-          Open Quiz
-        </button>
-      </div>
+  <button
+    onClick={toggleTextBox}
+    className="start-button2"  // Cambiado de clase aquí
+  >
+  </button>
+</div>
+
 
       <div
-        className={`fixed top-0 left-0 w-2/3 lg:w-1/3 h-full bg-white border-gray-300 shadow-lg transition-transform transform ${
-          isVisible ? "-translate-x-0" : "-translate-x-full"
-        } duration-500 ease-in-out`}
+        className={`fixed top-0 left-0 w-2/3 lg:w-1/3 h-full bg-white border-gray-300 shadow-lg transition-transform transform ${isVisible ? "translate-x-0" : "-translate-x-full"} duration-500 ease-in-out`}
       >
         <div className="relative flex flex-col justify-center md:items-center h-full p-6">
           <img
@@ -171,7 +166,11 @@ const Questions = () => {
             className="absolute top-4 left-1/2 transform -translate-x-1/2 p-8"
           />
 
-          {quizCompleted ? (
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <p>Cargando preguntas...</p>
+            </div>
+          ) : quizCompleted ? (
             // Muestra el mensaje de felicitación cuando el quiz está completado
             <div className="flex flex-col items-center justify-center h-full">
               <h1 className="text-lg md:text-2xl font-bold mb-4 mt-6">¡Buen trabajo!</h1>
@@ -223,11 +222,10 @@ const Questions = () => {
               </div>
             </>
           )}
-
         </div>
       </div>
     </div>
   );
 };
 
-export default Questions;
+export default Questions; 
