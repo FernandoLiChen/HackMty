@@ -1,7 +1,11 @@
+
 import { Auth0Provider } from '@auth0/auth0-react';
 import LoginButton from './components/loginButton';
 import LogoutButton from './components/logoutButton';
 import Profile from './components/showUserInfo';
+import Phone from "./components/Phone.jsx"
+import Text from './components/Text.jsx'
+import Questions from './components/Questions.jsx'
 
 function App() {
   return (
@@ -16,6 +20,9 @@ function App() {
       <LogoutButton/>
       <Profile/>
     </Auth0Provider>
+    <Questions />
+      <Text />
+      <Phone />
   );
 }
 
