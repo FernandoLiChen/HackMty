@@ -1,4 +1,5 @@
 // src/components/CameraPositions.js
+import React, { useEffect, useState } from 'react';
 import { Vector3, Euler } from 'three';
 
 const CameraPosition = [
@@ -15,16 +16,8 @@ const CameraPosition = [
     rotation: new Euler(-102.37 * (Math.PI / 180), 85.84 * (Math.PI / 180), 102.40 * (Math.PI / 180))
   },
   {
-    position: new Vector3(-31.60, -7.29, -10.09),
-    rotation: new Euler(-5.98 * (Math.PI / 180), -0.23 * (Math.PI / 180), -0.02 * (Math.PI / 180))
-  },
-  {
     position: new Vector3(-44.44, 3.48, -11.88),
     rotation: new Euler(-0.41 * (Math.PI / 180), 0.33 * (Math.PI / 180), 0.00 * (Math.PI / 180))
-  },
-  {
-    position: new Vector3(-25.86, 4.65, -10.45),
-    rotation: new Euler(-22.51 * (Math.PI / 180), 0.22 * (Math.PI / 180), 0.09 * (Math.PI / 180))
   },
   {
     position: new Vector3(-34.69, 4.19, 11.97),
