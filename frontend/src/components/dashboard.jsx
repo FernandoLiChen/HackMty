@@ -1,9 +1,13 @@
+import Phone from "./Phone.jsx"
+import Scene from "../models/Scene.jsx"
+
 const Dashboard = () => {
     return (
-      <div>
-        <h1>Bienvenido al Dashboard</h1>
-        {/* Aquí puedes agregar más lógica o componentes */}
-      </div>
+      <>
+      <Scene/>
+      <Phone />
+      </>
+      
     );
   };
   
